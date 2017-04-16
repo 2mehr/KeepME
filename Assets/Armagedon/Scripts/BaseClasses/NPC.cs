@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
@@ -59,23 +58,24 @@ public class NPC : CharBase {
                 break;
             case NPCMoveMode.Partol:Patrol();
                 break;
-            case NPCMoveMode.Attack:Attck();
-                break;
-
-               
+            case NPCMoveMode.Attack:Attack();
+                break;   
         }
-        MoveToTarget();
-        if (Sight.Ditect==true&&CType!=CharcterType.Enamey)
+
+       
+            MoveToTarget();
+      
+      
+        if (Sight.Ditect == true && CType != CharcterType.Enamey)
         {
-            print(Sight.Ditect);
             MoveMode = NPCMoveMode.Attack;
         }
-        if (Sight.AttackMode==true&& CType!= CharcterType.Enamey)
+        if (Sight.AttackMode == true && CType != CharcterType.Enamey)
         {
-              MoveMode = NPCMoveMode.Attack;
+            MoveMode = NPCMoveMode.Attack;
         }
-     
-        print(MoveMode);
+
+       
 
     }
     public void ChooseTarget()
@@ -112,18 +112,13 @@ public class NPC : CharBase {
         }
       
     }
-   
 
-    public void TakeCover(Transform cover)
-    {
-       
-    }
-    public void Attck()
+
+    public void Attack()
     {
         ChooseTarget();
         Shoot(CurrentWeaponID);
 
-       
     }
     public void Wander()
     {
@@ -166,8 +161,6 @@ public class NPC : CharBase {
                 CurrentPatrolPoint = 0;
                
             }
-           
-
         }
        
     }

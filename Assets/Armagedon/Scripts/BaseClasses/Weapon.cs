@@ -16,6 +16,7 @@ public class Weapon :Arms {
       
         if (TempFireRate <= 0 && (BulletCount > 0||BulletCount==-1))
         {
+          
             Bullet bull = Instantiate<Bullet>(Bull, transform.position, transform.rotation);
             bull.Damage = Damage;
             bull.CType = CType;
@@ -25,7 +26,7 @@ public class Weapon :Arms {
             if(BulletCount!=-1)
             BulletCount--;
             TempFireRate = FireRate;
-            print("Fire");
+          
         }
         else
         {
