@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public delegate void OnDeathDelegate();
+public delegate void OnDeathDelegate(CharBase e);
 
 public interface IShootable
 {
@@ -12,6 +12,8 @@ public interface IShootable
 
     List<Reward> Rewards { get; set; }
 
-    event OnDeathDelegate OnDeath; 
+    event OnDeathDelegate OnDeath;
+      void Die();
+
 }
 

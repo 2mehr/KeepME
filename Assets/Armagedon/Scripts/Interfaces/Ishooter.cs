@@ -4,29 +4,25 @@ using UnityEngine;
 
 
 public interface Ishooter  {
-    public int CurtentVeponID;
-    public int rt;
-    public List<Weapen> Wepons;
+    int CurrentWeaponID { get; set; }
+  
+    List<Weapon> Weapons { get; set; }
+    [SerializeField]
+    CharcterType CType { get; set; }
 
    
-    public enum CType
-    {
-        Player,
-        Enamey,
-        Frends
-        
-    };
-    public Transform AtackPont;
+    Transform Target { get; set; }
 
-    public bool IsMelee;
-
-	
-   public void ChooseWepons()
-    {
+    bool IsMelee { get; set; }
+    
+    void Shoot(int currentwepID);
+    
 
     }
-    public void Shoot()
-    {
+public enum CharcterType
+{
+    Player,
+    Enamey,
+    Frends
 
-    }
-}
+};

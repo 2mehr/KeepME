@@ -1,16 +1,27 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
 public class Reward : MonoBehaviour {
+    public int Aamount;
+    RewardType m_rewardType;
 
-	// Use this for initialization
-	void Start () {
-		
-	}
-	
-	// Update is called once per frame
-	void Update () {
-		
-	}
+    public RewardType RewardType
+    {
+        get
+        {
+            return m_rewardType;
+        }
+
+        set
+        {
+            m_rewardType = value;
+        }
+    }
+   
+}
+public enum RewardType
+{
+    Com,
+    Bullet,
+    Firsod
 }
