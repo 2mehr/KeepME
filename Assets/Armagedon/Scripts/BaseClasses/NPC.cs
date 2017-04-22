@@ -9,6 +9,7 @@ public enum NPCMoveMode
     Wander,
     Idle,
     Attack
+    
 }
 public class NPC : CharBase {
     public NPCMoveMode MoveMode;
@@ -21,6 +22,10 @@ public class NPC : CharBase {
     CharacterController controller;
     public List<Transform> PatrolPoints;
      public int CurrentPatrolPoint;
+    FildView fow = new FildView();
+
+
+
     public override void Die()
     {
       
@@ -47,6 +52,7 @@ public class NPC : CharBase {
     {
   
         NavAgent = GetComponent<NavMeshAgent>();
+       
     }
     
 
@@ -59,13 +65,13 @@ public class NPC : CharBase {
             case NPCMoveMode.Partol:Patrol();
                 break;
             case NPCMoveMode.Attack:Attack();
-                break;   
+                break;
+               
         }
-
        
-            MoveToTarget();
-      
-      
+        MoveToTarget();
+
+
         if (Sight.Ditect == true && CType != CharcterType.Enamey)
         {
             MoveMode = NPCMoveMode.Attack;
@@ -75,21 +81,21 @@ public class NPC : CharBase {
             MoveMode = NPCMoveMode.Attack;
         }
 
-       
+
 
     }
     public void ChooseTarget()
     {
 
-        if ( LevelManager.Manager.Enemeies.Count == 0)
+        if ( fow.visibleTarget.Count ==0)
         {
            
             return;
         }
-           
-        Transform nearEnemy =LevelManager. Manager.Enemeies[0].GetComponent<Transform>();
 
-        foreach ( var item in LevelManager. Manager.Enemeies)
+        Transform nearEnemy = fow.visibleTarget[0]; //LevelManager. Manager.Enemeies[0].GetComponent<Transform>();
+
+        foreach ( var item in fow.visibleTarget)
         {
             if (Vector3.Distance(transform.position,item.transform.position)<Vector3.Distance(transform.position,nearEnemy.transform.position))
             {
@@ -97,7 +103,7 @@ public class NPC : CharBase {
              
             }
         }
-        Target = nearEnemy;
+       // Target = nearEnemy;
         RotateToTarget();
        
     }
@@ -169,6 +175,5 @@ public class NPC : CharBase {
         if(Target!=null)
         NavAgent.destination = Target.position;
     }
-   
-
+  
 }
