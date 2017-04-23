@@ -23,6 +23,7 @@ public class FildView : MonoBehaviour {
         ViewMesh.name = ("ViewMesh");
         ViewMeshFilter.mesh = ViewMesh;
         StartCoroutine("FindToTargetWithDelay",2f);
+      
     }
 
     IEnumerator FindToTargetWithDelay(float delay)
@@ -37,13 +38,14 @@ public class FildView : MonoBehaviour {
     {
         DrawFieldOfView();
     }
+  public  Transform target;
     void FindIsTaret()
     {
         visibleTarget.Clear();
         Collider[] targetsInViewRadius = Physics.OverlapSphere(transform.position, ViewRadius, TaretMask);
         for (int i = 0; i < targetsInViewRadius.Length; i++)
         {
-            Transform target = targetsInViewRadius[i].transform;
+             target = targetsInViewRadius[i].transform;
             Vector3 dirToTarget = (target.position - transform.position).normalized;
             if (Vector3.Angle(transform.forward,dirToTarget)<ViewAngel/2)
             {
@@ -51,6 +53,7 @@ public class FildView : MonoBehaviour {
                 if (!Physics.Raycast(transform.position, dirToTarget, dstToTarget, ObstacleMask))
                 {
                     visibleTarget.Add(target);
+                  
                 }
             }
         }
@@ -138,14 +141,19 @@ public class FildView : MonoBehaviour {
     {
         Vector3 dir =DirFromAngel(globalAngel, true);
         RaycastHit hit;
+       
         if (Physics.Raycast(transform.position,dir,out hit,ViewRadius,ObstacleMask))
         {
+           
             return new ViewCastInfo(true, hit.point, hit.distance, globalAngel);
+         
         }
         else
         {
+            
             return new ViewCastInfo(false, transform.position+dir*ViewRadius, ViewRadius, globalAngel);
         }
+      
     }
 
     public Vector3 DirFromAngel(float angelDegrees , bool anelIsGlobal )

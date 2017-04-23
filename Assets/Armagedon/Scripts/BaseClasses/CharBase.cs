@@ -100,7 +100,19 @@ public abstract class CharBase : MonoBehaviour, IShootable, Ishooter
         }
     }
 
-   
+    Transform Ishooter.Target
+    {
+        get
+        {
+            throw new NotImplementedException();
+        }
+
+        set
+        {
+            throw new NotImplementedException();
+        }
+    }
+
     public abstract void Shoot(int currentWepID);
 
     public abstract void Move();

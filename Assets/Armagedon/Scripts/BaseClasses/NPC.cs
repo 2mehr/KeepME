@@ -21,8 +21,8 @@ public class NPC : CharBase {
     NavMeshAgent NavAgent;
     CharacterController controller;
     public List<Transform> PatrolPoints;
-     public int CurrentPatrolPoint;
-    FildView fow = new FildView();
+    public int CurrentPatrolPoint;
+    FildView fow;
 
 
 
@@ -30,6 +30,8 @@ public class NPC : CharBase {
     {
       
         GetComponent<Renderer>().material.color = Color.red;
+        //fow.visibleTarget.RemoveAt(0);
+        MoveMode = NPCMoveMode.Partol;
         OnDeath(this);
     }
 
@@ -52,7 +54,7 @@ public class NPC : CharBase {
     {
   
         NavAgent = GetComponent<NavMeshAgent>();
-       
+        fow = GetComponent<FildView>();
     }
     
 
@@ -68,44 +70,47 @@ public class NPC : CharBase {
                 break;
                
         }
-       
         MoveToTarget();
 
-
-        if (Sight.Ditect == true && CType != CharcterType.Enamey)
+        if (fow.target !=null && CType != CharcterType.Enamey)
         {
             MoveMode = NPCMoveMode.Attack;
         }
-        if (Sight.AttackMode == true && CType != CharcterType.Enamey)
-        {
-            MoveMode = NPCMoveMode.Attack;
-        }
-
-
-
+      
     }
+    Transform nearEnemy;
     public void ChooseTarget()
     {
-
-        if ( fow.visibleTarget.Count ==0)
-        {
-           
-            return;
-        }
-
-        Transform nearEnemy = fow.visibleTarget[0]; //LevelManager. Manager.Enemeies[0].GetComponent<Transform>();
-
-        foreach ( var item in fow.visibleTarget)
-        {
-            if (Vector3.Distance(transform.position,item.transform.position)<Vector3.Distance(transform.position,nearEnemy.transform.position))
-            {
-                nearEnemy = item.transform;
-             
-            }
-        }
-       // Target = nearEnemy;
-        RotateToTarget();
        
+        if (fow.visibleTarget.Count == 0)
+        { 
+            return; 
+        }
+       
+      
+        for (int i = 0; i < fow.visibleTarget.Count; i++)
+        {
+             nearEnemy = fow.visibleTarget[i];
+            print(fow.visibleTarget[i].name);
+        }
+      
+
+            foreach (Transform item in fow.visibleTarget)
+            {
+            if (Vector3.Distance(transform.position, item.position) < Vector3.Distance(transform.position, new Vector3(nearEnemy.position.x, nearEnemy.position.y, nearEnemy.position.z)))
+                {
+                    nearEnemy =item;
+                }
+              
+            }
+        
+            Target.position = new Vector3(nearEnemy.position.x, nearEnemy.position.y, nearEnemy.position.z - 3);
+            print(Target.name);
+      
+       
+       
+        RotateToTarget();
+      
     }
 
     public void RotateToTarget()
