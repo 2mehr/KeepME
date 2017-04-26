@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
+
 [CustomEditor(typeof(FildView))]
 public class FildOfEditor : Editor {
 
@@ -15,9 +16,9 @@ public class FildOfEditor : Editor {
         Handles.DrawLine(fow.transform.position, fow.transform.position + viewAngelA * fow.ViewRadius);
         Handles.DrawLine(fow.transform.position, fow.transform.position + viewAngelB * fow.ViewRadius);
         Handles.color = Color.red;
-        foreach (Transform item in fow.visibleTarget)
+        foreach (CharBase item in fow.visibleTarget)
         {
-            Handles.DrawLine(fow.transform.position, item.position);
+            Handles.DrawLine(fow.transform.position, item.transform.position);
         }
     }
 

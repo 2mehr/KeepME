@@ -2,10 +2,12 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public delegate void OnDeathDelegate(CharBase e);
+public delegate void OnDeathDelegate(CharBase e,CharBase killer);
 
 public interface IShootable
 {
+
+    bool IsDaed { get; set; }
     float HP { get; set; }
 
     float Armor { get; set; }
@@ -13,7 +15,7 @@ public interface IShootable
     List<Reward> Rewards { get; set; }
 
     event OnDeathDelegate OnDeath;
-      void Die();
+      void Die( CharBase killer);
 
 }
 

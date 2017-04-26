@@ -14,6 +14,7 @@ public interface Ishooter  {
     Transform Target { get; set; }
 
     bool IsMelee { get; set; }
+    Transform ShooterPoint { get; set; }
     
     void Shoot(int currentwepID);
     

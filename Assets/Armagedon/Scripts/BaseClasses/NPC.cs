@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
 
+
 public enum NPCMoveMode
 {
     Partol,
@@ -23,62 +24,88 @@ public class NPC : CharBase {
     public List<Transform> PatrolPoints;
     public int CurrentPatrolPoint;
     FildView fow;
+   
 
-
-
-    public override void Die()
+    public override void Die( CharBase killer)
     {
-      
+        print(killer.CType + "v"+CType);
+        if (IsDaed == true)
+            return;
+        if (CType== CharcterType.Player)
+        {
+
+            Time.timeScale = 0;
+          
+        }
         GetComponent<Renderer>().material.color = Color.red;
-        //fow.visibleTarget.RemoveAt(0);
-        MoveMode = NPCMoveMode.Partol;
-        OnDeath(this);
+        OnDeath(this,killer);
+        IsDaed = true;
+        ((NPC)killer).Target = null;
+        killer.GetComponent<FildView>().visibleTarget.Remove(this);
+        ((NPC)killer).MoveMode = NPCMoveMode.Partol;
     }
 
-    public override void Move()
-    {
-        throw new NotImplementedException();
-    }
+  
 
     public override void Shoot(int currentWepID)
     {
-        if (Weapons!=null&&Weapons.Count>0)
+        if (Weapons != null && Weapons.Count > 0)
         {
             Weapons[currentWepID].Fire();
         }
-      
-    }
 
-    // Use this for initialization
+
+    }
     void Start()
     {
   
         NavAgent = GetComponent<NavMeshAgent>();
         fow = GetComponent<FildView>();
+       
     }
-    
+
 
     void Update ()
     {
+      
+        if (IsDaed == true)
+            return;
         switch (MoveMode)
         {
             case NPCMoveMode.Wander:Wander();
                 break;
             case NPCMoveMode.Partol:Patrol();
                 break;
-            case NPCMoveMode.Attack:Attack();
+            case NPCMoveMode.Attack:
+                if(Target!=null)
+                {
+                    Attack();
+                }
+              
                 break;
                
         }
-        MoveToTarget();
-
-        if (fow.target !=null && CType != CharcterType.Enamey)
-        {
-            MoveMode = NPCMoveMode.Attack;
-        }
       
+        if(Target!=null)
+        {
+            RotateToTarget();
+            MoveToTarget();
+            if (Vector3.Distance(transform.position, Target.position) < NavAgent.stoppingDistance)
+            {
+                NavAgent.Stop();
+            }
+            else
+            {
+                NavAgent.Resume();
+            }
+
+
+        }
+
+
+
     }
-    Transform nearEnemy;
+ // public  Transform NearEnemy;
     public void ChooseTarget()
     {
        
@@ -86,39 +113,26 @@ public class NPC : CharBase {
         { 
             return; 
         }
-       
-      
-        for (int i = 0; i < fow.visibleTarget.Count; i++)
-        {
-             nearEnemy = fow.visibleTarget[i];
-            print(fow.visibleTarget[i].name);
-        }
-      
+        Target = fow.visibleTarget[0].transform;
 
-            foreach (Transform item in fow.visibleTarget)
+            foreach (CharBase item in fow.visibleTarget)
             {
-            if (Vector3.Distance(transform.position, item.position) < Vector3.Distance(transform.position, new Vector3(nearEnemy.position.x, nearEnemy.position.y, nearEnemy.position.z)))
+            if (Vector3.Distance(transform.position, item.transform.position) < Vector3.Distance(transform.position, new Vector3(Target.position.x, Target.position.y, Target.position.z)))
                 {
-                    nearEnemy =item;
+                    Target =item.transform;
                 }
               
             }
         
-            Target.position = new Vector3(nearEnemy.position.x, nearEnemy.position.y, nearEnemy.position.z - 3);
-            print(Target.name);
-      
-       
-       
-        RotateToTarget();
-      
+        
     }
 
     public void RotateToTarget()
     {
-        if (CType == CharcterType.Player)
+      
         {
            Vector3 relativePos = Target.position - transform.position;
-            Quaternion rotation = Quaternion.RotateTowards(transform.rotation, Quaternion.LookRotation(relativePos),22*Time.deltaTime);
+            Quaternion rotation = Quaternion.RotateTowards(transform.rotation, Quaternion.LookRotation(relativePos),40*Time.deltaTime);
             transform.rotation = rotation;
         }
       
@@ -127,9 +141,10 @@ public class NPC : CharBase {
 
     public void Attack()
     {
-        ChooseTarget();
+        // ChooseTarget();
         Shoot(CurrentWeaponID);
-
+        NavAgent.stoppingDistance = 6;
+       
     }
     public void Wander()
     {
@@ -158,10 +173,11 @@ public class NPC : CharBase {
     }
     void Patrol()
     {
-       
+     
         if (PatrolPoints == null)
             return;
-         Target = PatrolPoints[CurrentPatrolPoint];
+        NavAgent.stoppingDistance = 0;
+        Target = PatrolPoints[CurrentPatrolPoint];
 
         if (Vector3.Distance(transform.position, PatrolPoints[CurrentPatrolPoint].position) < 1f)
         {
@@ -180,5 +196,6 @@ public class NPC : CharBase {
         if(Target!=null)
         NavAgent.destination = Target.position;
     }
+   
   
 }

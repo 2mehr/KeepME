@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class Bullet : Arms {
     float Distance;
-    // Use this for initialization
+
     public void Fly()
     {
         transform.position = Vector3.MoveTowards(transform.position, transform.position+transform.forward, Speed * Time.deltaTime);
@@ -14,6 +14,7 @@ public class Bullet : Arms {
         {
             Destroy(gameObject);
         }
+      
     }
     private void Update()
     {
@@ -35,10 +36,18 @@ public class Bullet : Arms {
         {
             other.GetComponent<IShootable>().HP -= Damage;
             Destroy(gameObject);
+            if (target.Target == null)
+            {
+                target.Target = this.Shooter.transform;
+                ((NPC)target).MoveMode = NPCMoveMode.Attack;
+            }
+           
         }
         if (other.GetComponent<IShootable>().HP<=0)
         {
-            other.GetComponent<IShootable>().Die();
+            other.GetComponent<IShootable>().Die(this.Shooter);
+
+         
         }
     }
 }

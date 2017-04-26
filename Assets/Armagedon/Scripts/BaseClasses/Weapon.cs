@@ -22,11 +22,12 @@ public class Weapon :Arms {
             bull.CType = CType;
             bull.ExplosionRange = ExplosionRange;
             bull.Range = Range;
+            bull.Shooter = this.Shooter;
             bull.Speed = Speed;
             if(BulletCount!=-1)
             BulletCount--;
             TempFireRate = FireRate;
-          
+         
         }
         else
         {

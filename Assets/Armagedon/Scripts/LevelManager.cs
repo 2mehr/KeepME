@@ -24,10 +24,20 @@ public class LevelManager : MonoBehaviour {
 
     }
 
-    private void InEnemy_OnDeath(CharBase e)
+    private void InEnemy_OnDeath(CharBase e , CharBase killer)
     {
        
         Enemeies.Remove(e);
+        try
+        {
+            ((NPC)killer).ChooseTarget();
+            print(killer.name+"Target");
+        }
+        catch
+        {
+           
+        }
+        
     }
 
 

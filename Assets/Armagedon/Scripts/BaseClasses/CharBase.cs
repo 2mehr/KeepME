@@ -6,7 +6,7 @@ using UnityEngine;
 
 public abstract class CharBase : MonoBehaviour, IShootable, Ishooter
 {
-   
+  
     int m_CurrentWeaponID;
     
     public int CurrentWeaponID
@@ -100,22 +100,44 @@ public abstract class CharBase : MonoBehaviour, IShootable, Ishooter
         }
     }
 
-    Transform Ishooter.Target
+ 
+    bool m_IsDaed;
+    public bool IsDaed
     {
         get
         {
-            throw new NotImplementedException();
+            return m_IsDaed;
         }
 
         set
         {
-            throw new NotImplementedException();
+            m_IsDaed = value;
+        }
+    }
+    bool m_IsAttack;
+    public bool IsAttack
+    {
+        get { return m_IsAttack; }
+        set { m_IsAttack = value; }
+    }
+    [SerializeField]
+    Transform m_ShooterPoint;
+    public Transform ShooterPoint
+    {
+        get
+        {
+            return m_ShooterPoint;
+        }
+
+        set
+        {
+            m_ShooterPoint = value;
         }
     }
 
     public abstract void Shoot(int currentWepID);
 
-    public abstract void Move();
+  
 
-    public abstract void Die();
+    public abstract void Die( CharBase killer);
 }

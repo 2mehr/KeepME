@@ -3,27 +3,39 @@ using System.Collections.Generic;
 using UnityEngine;
 
 
+public delegate void OnInRangeDelegate(NPC npc);
+
 public class FildView : MonoBehaviour {
+    public event OnInRangeDelegate OnInRange;
+
     public float ViewRadius;
     [Range(0,360)]
     public float ViewAngel;
-    public LayerMask TaretMask;
+    public LayerMask TargetMask;
     public LayerMask ObstacleMask;
   //  [HideInInspector]
-    public List<Transform> visibleTarget = new List<Transform>();
+    public List<CharBase> visibleTarget = new List<CharBase>();
 
     public float MeshReosolution;
     public int edgeResolution;
     public float edgeDstThreshold;
     public MeshFilter ViewMeshFilter;
     Mesh ViewMesh;
+    CharBase Charcter;
     private void Start()
     {
         ViewMesh = new Mesh();
         ViewMesh.name = ("ViewMesh");
         ViewMeshFilter.mesh = ViewMesh;
         StartCoroutine("FindToTargetWithDelay",2f);
-      
+        Charcter = GetComponent<CharBase>();
+        OnInRange += FildView_OnInRange;
+    }
+
+    private void FildView_OnInRange(NPC npc)
+    {
+        npc.MoveMode = NPCMoveMode.Attack;
+        npc.ChooseTarget();
     }
 
     IEnumerator FindToTargetWithDelay(float delay)
@@ -31,32 +43,49 @@ public class FildView : MonoBehaviour {
         while (true)
         {
             yield return new WaitForSeconds(delay);
-            FindIsTaret();
+            if(visibleTarget.Count==0)
+            FindIsTarget();
         }
     }
+   
     private void LateUpdate()
     {
-        DrawFieldOfView();
+        //DrawFieldOfView();
     }
   public  Transform target;
-    void FindIsTaret()
+    void FindIsTarget()
     {
+        CharBase targetChar;
         visibleTarget.Clear();
-        Collider[] targetsInViewRadius = Physics.OverlapSphere(transform.position, ViewRadius, TaretMask);
+       
+       Collider[] targetsInViewRadius = Physics.OverlapSphere(transform.position, ViewRadius);
         for (int i = 0; i < targetsInViewRadius.Length; i++)
         {
-             target = targetsInViewRadius[i].transform;
-            Vector3 dirToTarget = (target.position - transform.position).normalized;
-            if (Vector3.Angle(transform.forward,dirToTarget)<ViewAngel/2)
+            targetChar = targetsInViewRadius[i].GetComponent<CharBase>();
+           
+           
+            if (targetChar!=null )
             {
-                float dstToTarget = Vector3.Distance(transform.position, target.position);
-                if (!Physics.Raycast(transform.position, dirToTarget, dstToTarget, ObstacleMask))
+               
+                if((Charcter.CType== CharcterType.Player && targetChar.CType== CharcterType.Enamey)||Charcter.CType == CharcterType.Enamey && (targetChar.CType == CharcterType.Frends||targetChar.CType == CharcterType.Player))
                 {
-                    visibleTarget.Add(target);
-                  
+                   
+                    RaycastHit hit;
+                    Physics.Raycast(Charcter.ShooterPoint.transform.position, targetChar.transform.position - Charcter.ShooterPoint.position, out hit,ViewRadius);
+                    if (hit.transform!=null && hit.transform.GetComponent<CharBase>()&& !targetChar.IsDaed )
+                    {
+                        
+                        visibleTarget.Add(targetsInViewRadius[i].GetComponent<CharBase>());
+
+                        this.OnInRange((NPC)Charcter);
+                       
+                    }
                 }
+             
             }
+           
         }
+
     }
     void DrawFieldOfView()
     {
@@ -67,9 +96,9 @@ public class FildView : MonoBehaviour {
 
         for (int i = 0; i <= setpCount; i++)
         {
-            float angel = transform.eulerAngles.y - ViewAngel / 2 + stepAngelSize * i;
+           float angel = transform.eulerAngles.y - ViewAngel / 2 + stepAngelSize * i;
             ViewCastInfo newViewCast = ViewCast(angel);
-            Debug.DrawLine(transform.position, transform.position + DirFromAngel(angel, true) * ViewRadius, Color.red);
+           // Debug.DrawLine(transform.position, transform.position + DirFromAngel(angel, true) * ViewRadius, Color.red);
             if (i > 0)
             {
                 bool edgeDstThreSholdExeeded = Mathf.Abs(oldViwCast.dst - newViewCast.dst) > edgeDstThreshold;
