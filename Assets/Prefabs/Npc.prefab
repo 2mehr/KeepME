@@ -316,8 +316,8 @@ BoxCollider:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1269291048944880}
   m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_Enabled: 0
+  m_IsTrigger: 1
+  m_Enabled: 1
   serializedVersion: 2
   m_Size: {x: 1, y: 1, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
@@ -333,7 +333,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ViewRadius: 7.95
-  ViewAngel: 96
+  ViewAngel: 100
   TargetMask:
     serializedVersion: 2
     m_Bits: 512
@@ -381,8 +381,9 @@ MonoBehaviour:
   m_Weapons:
   - {fileID: 114368349100973986}
   m_CType: 0
-  m_HP: 0
+  m_HP: 10
   m_Target: {fileID: 0}
+  m_IsDaed: 0
   m_ShooterPoint: {fileID: 4632588373125926}
   MoveMode: 0
   SightRange: 2
@@ -392,6 +393,7 @@ MonoBehaviour:
   - {fileID: 0}
   - {fileID: 0}
   CurrentPatrolPoint: 0
+  CoverPos: []
 --- !u!195 &195464815202647026
 NavMeshAgent:
   m_ObjectHideFlags: 1

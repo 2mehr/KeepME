@@ -34,8 +34,12 @@ public class FildView : MonoBehaviour {
 
     private void FildView_OnInRange(NPC npc)
     {
-        npc.MoveMode = NPCMoveMode.Attack;
-        npc.ChooseTarget();
+        if(npc.MoveMode!= NPCMoveMode.Cover)
+        {
+            npc.MoveMode = NPCMoveMode.Attack;
+            npc.ChooseTarget();
+        }
+       
     }
 
     IEnumerator FindToTargetWithDelay(float delay)
@@ -43,14 +47,16 @@ public class FildView : MonoBehaviour {
         while (true)
         {
             yield return new WaitForSeconds(delay);
-            if(visibleTarget.Count==0)
-            FindIsTarget();
+         //   if(visibleTarget.Count==0)
+         //   FindIsTarget();
         }
     }
    
     private void LateUpdate()
     {
         //DrawFieldOfView();
+      
+
     }
   public  Transform target;
     void FindIsTarget()
@@ -62,8 +68,9 @@ public class FildView : MonoBehaviour {
         for (int i = 0; i < targetsInViewRadius.Length; i++)
         {
             targetChar = targetsInViewRadius[i].GetComponent<CharBase>();
-           
-           
+
+                      
+
             if (targetChar!=null )
             {
                
@@ -72,20 +79,26 @@ public class FildView : MonoBehaviour {
                    
                     RaycastHit hit;
                     Physics.Raycast(Charcter.ShooterPoint.transform.position, targetChar.transform.position - Charcter.ShooterPoint.position, out hit,ViewRadius);
-                    if (hit.transform!=null && hit.transform.GetComponent<CharBase>()&& !targetChar.IsDaed )
+                    if (hit.transform!=null && hit.transform.GetComponent<CharBase>()&& !targetChar.IsDaed  )
                     {
                         
                         visibleTarget.Add(targetsInViewRadius[i].GetComponent<CharBase>());
-
-                        this.OnInRange((NPC)Charcter);
                        
+                        this.OnInRange((NPC)Charcter);
+                        
+                        
                     }
+                   
                 }
              
             }
            
         }
 
+    }
+    private void Update()
+    {
+        FindIsTarget();
     }
     void DrawFieldOfView()
     {
@@ -98,7 +111,6 @@ public class FildView : MonoBehaviour {
         {
            float angel = transform.eulerAngles.y - ViewAngel / 2 + stepAngelSize * i;
             ViewCastInfo newViewCast = ViewCast(angel);
-           // Debug.DrawLine(transform.position, transform.position + DirFromAngel(angel, true) * ViewRadius, Color.red);
             if (i > 0)
             {
                 bool edgeDstThreSholdExeeded = Mathf.Abs(oldViwCast.dst - newViewCast.dst) > edgeDstThreshold;

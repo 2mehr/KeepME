@@ -18,27 +18,13 @@ public class LevelManager : MonoBehaviour {
            
            
                 Enemeies.Add(inEnemy);
-            inEnemy.OnDeath += InEnemy_OnDeath;
+           
            
         }
 
     }
 
-    private void InEnemy_OnDeath(CharBase e , CharBase killer)
-    {
-       
-        Enemeies.Remove(e);
-        try
-        {
-            ((NPC)killer).ChooseTarget();
-            print(killer.name+"Target");
-        }
-        catch
-        {
-           
-        }
-        
-    }
+  
 
 
 

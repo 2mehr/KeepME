@@ -9,9 +9,11 @@ public enum NPCMoveMode
     Partol,
     Wander,
     Idle,
-    Attack
+    Attack,
+    Cover
     
 }
+
 public class NPC : CharBase {
     public NPCMoveMode MoveMode;
     public float SightRange;
@@ -24,29 +26,20 @@ public class NPC : CharBase {
     public List<Transform> PatrolPoints;
     public int CurrentPatrolPoint;
     FildView fow;
+    public NPCMoveMode DefaultMoveMode;
+    public List<Transform> CoverPos = new List<Transform>();
    
 
     public override void Die( CharBase killer)
     {
-        print(killer.CType + "v"+CType);
-        if (IsDaed == true)
-            return;
-        if (CType== CharcterType.Player)
-        {
-
-            Time.timeScale = 0;
+         
           
-        }
-        GetComponent<Renderer>().material.color = Color.red;
-        OnDeath(this,killer);
-        IsDaed = true;
-        ((NPC)killer).Target = null;
-        killer.GetComponent<FildView>().visibleTarget.Remove(this);
-        ((NPC)killer).MoveMode = NPCMoveMode.Partol;
+                 
+            OnDeath(this, killer);
+                
+       /// killer.GetComponent<FildView>().visibleTarget.Remove(this);
+          
     }
-
-  
-
     public override void Shoot(int currentWepID)
     {
         if (Weapons != null && Weapons.Count > 0)
@@ -58,18 +51,49 @@ public class NPC : CharBase {
     }
     void Start()
     {
-  
+        this.OnDeath += InEnemy_OnDeath;
+
+        DefaultMoveMode = this.MoveMode;
         NavAgent = GetComponent<NavMeshAgent>();
         fow = GetComponent<FildView>();
+        
        
+    }
+    private void InEnemy_OnDeath(CharBase e, CharBase killer)
+    {
+        IsDaed = true;
+        GetComponent<Renderer>().material.color = Color.red;
+        if (e.CType == CharcterType.Enamey)
+           Camera.main.GetComponent<LevelManager>().Enemeies.Remove(e);
+        //
+        ((NPC)killer).ChooseTarget();
+
+        NPC[] allNpc = GameObject.FindObjectsOfType<NPC>();
+        for (int i = 0; i < allNpc.Length; i++)
+        { 
+           if (allNpc[i].Target == this.transform)
+            {
+              //  print(allNpc[i].transform.name);
+                allNpc[i].Target = null;
+                allNpc[i].MoveMode = allNpc[i].DefaultMoveMode;
+                allNpc[i].GetComponent<FildView>().visibleTarget.Remove(this);
+               // print(allNpc[i].name);
+            }
+           
+        }
+
+
     }
 
 
     void Update ()
     {
-      
-        if (IsDaed == true)
+
+       
+
+            if (IsDaed == true)
             return;
+       
         switch (MoveMode)
         {
             case NPCMoveMode.Wander:Wander();
@@ -81,18 +105,26 @@ public class NPC : CharBase {
                 {
                     Attack();
                 }
-              
+                break;
+            case NPCMoveMode.Cover:
+                TakeCover();
                 break;
                
         }
-      
-        if(Target!=null)
+       if(MoveMode == NPCMoveMode.Cover && (transform.position - Target.position).magnitude < 1)
         {
+            MoveMode = NPCMoveMode.Attack;
+        }
+
+        if (Target!=null)
+        {
+          
             RotateToTarget();
             MoveToTarget();
             if (Vector3.Distance(transform.position, Target.position) < NavAgent.stoppingDistance)
             {
                 NavAgent.Stop();
+              
             }
             else
             {
@@ -105,26 +137,31 @@ public class NPC : CharBase {
 
 
     }
- // public  Transform NearEnemy;
     public void ChooseTarget()
     {
-       
-        if (fow.visibleTarget.Count == 0)
-        { 
+        if (MoveMode != NPCMoveMode.Attack)
+            return;
+        if (  fow.visibleTarget.Count == 0||(Target != null&&Target.GetComponent<CharBase>()))
+        {
+           
             return; 
+
         }
         Target = fow.visibleTarget[0].transform;
 
-            foreach (CharBase item in fow.visibleTarget)
+        if(Target.GetComponent<CharBase>().CType == CharcterType.Enamey)
+         
+
+        foreach (CharBase item in fow.visibleTarget)
             {
             if (Vector3.Distance(transform.position, item.transform.position) < Vector3.Distance(transform.position, new Vector3(Target.position.x, Target.position.y, Target.position.z)))
                 {
                     Target =item.transform;
+                   
                 }
               
             }
-        
-        
+       
     }
 
     public void RotateToTarget()
@@ -141,10 +178,11 @@ public class NPC : CharBase {
 
     public void Attack()
     {
-        // ChooseTarget();
+
         Shoot(CurrentWeaponID);
-        NavAgent.stoppingDistance = 6;
-       
+        NavAgent.stoppingDistance = fow.ViewRadius;
+        TakeCover();
+        print("oooo" + this.name);
     }
     public void Wander()
     {
@@ -195,6 +233,36 @@ public class NPC : CharBase {
     {
         if(Target!=null)
         NavAgent.destination = Target.position;
+    }
+   
+    GameObject[] Covers;
+   public  void TakeCover()
+    {
+       
+        if (CType == CharcterType.Enamey)
+        {
+             Covers = GameObject.FindGameObjectsWithTag("Cover");
+            
+            for (int i = 0; i < Covers.Length; i++)
+            {
+
+                if ((Covers[i].transform.position - transform.position).magnitude <= fow.ViewRadius && Covers[i].GetComponent<Cover>().IsUccupired != true)
+                {
+                    if ((Covers[i].transform.position - Target.position).magnitude < fow.ViewRadius)
+                    {
+                        Target = Covers[i].transform;
+                        Covers[i].GetComponent<Cover>().IsUccupired = true;
+                        Covers[i].GetComponent<Cover>().Uccupier = this;
+                        MoveMode = NPCMoveMode.Cover;
+                        NavAgent.stoppingDistance = 0;
+                        print("KKKK" + this.name);
+                        break;
+                    }
+                }
+                
+            }
+        }
+       
     }
    
   

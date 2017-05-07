@@ -6,7 +6,18 @@ using UnityEngine;
 
 public abstract class CharBase : MonoBehaviour, IShootable, Ishooter
 {
-  
+    float m_HpSum;
+    public float HpSum
+    {
+        get
+        {
+          return  m_HpSum;
+        }
+        set
+        {
+            m_HpSum = value;
+        }
+    }
     int m_CurrentWeaponID;
     
     public int CurrentWeaponID
@@ -100,7 +111,7 @@ public abstract class CharBase : MonoBehaviour, IShootable, Ishooter
         }
     }
 
- 
+ [SerializeField]
     bool m_IsDaed;
     public bool IsDaed
     {
